@@ -1,4 +1,4 @@
-import sqlite from "sqlite3";
+import sqlite3 from 'sqlite3';
 
 const db = new sqlite3.Database("library_db.sqlite", (err) => {
   if (err) {

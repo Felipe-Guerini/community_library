@@ -21,9 +21,9 @@ function createUserRepository(newUser) {
       [username, email, password, avatar],
       (err) => {
         if (err) {
-          rej(err);
+          reject(err);
         } else {
-          resolve((messsage = "Usuário criado com sucesso"));
+          resolve({ id: this.lastID, ...newUser });
         }
       }
     );
