@@ -20,7 +20,6 @@ function createUserRepository(newUser) {
       `,
       [username, email, password, avatar],
       function (err) {
-        // Use 'function' para ter acesso a 'this.lastID'
         if (err) {
           reject(err);
         } else {
@@ -76,7 +75,7 @@ function findAllUserRepository() {
     db.all(
       `
       SELECT id, username, email, avatar FROM users;
-  `,
+    `,
       [],
       (err, rows) => {
         if (err) {
@@ -92,21 +91,52 @@ function findAllUserRepository() {
 function updateUserRepository(id, user) {
   return new Promise((resolve, reject) => {
     const { username, email, password, avatar } = user;
+    const fields = ["username", "email", "password", "avatar"];
+    let query = "UPDATE users SET ";
+    const values = [];
+
+    fields.forEach((field) => {
+      if (user[field] !== undefined) {
+        query += `${field} = ?, `;
+        values.push(user[field]);
+      }
+    });
+
+    
+    query = query.slice(0, -2);
+
+    
+    query += " WHERE id = ?;";
+    
+
+    values.push(id);
+
+    console.log(`Query: ${query}`);
+    console.log(`Values: ${values}`);
+
+    db.run(query, values, (err) => {
+      if (err) {
+        reject(err);
+      } else {
+        resolve({ ...user, id });
+      }
+    });
+  });
+}
+
+async function deleteUserRepository(id) {
+  return new Promise((resolve, reject) => {
     db.run(
       `
-      UPDATE users SET 
-      username = ?,
-      email = ?,
-      password = ?,
-      avatar = ? 
+      DELETE FROM users
       WHERE id = ?;
       `,
-      [username, email, password, avatar, id],
+      [id],
       (err) => {
         if (err) {
           reject(err);
         } else {
-          resolve({ id, ...user });
+          resolve({ message: "User deleted successfully", id });
         }
       }
     );
@@ -119,4 +149,5 @@ export default {
   findUserByIdRepository,
   findAllUserRepository,
   updateUserRepository,
+  deleteUserRepository,
 };

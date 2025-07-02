@@ -42,10 +42,21 @@ async function updateUserController(req, res) {
     return res.status(404).send(e.message);
   }
 }
+async function deleteUserController(req, res) {
+  const { id } = req.params;
+
+  try {
+    const message = await userService.deleteUserService(id);
+    res.send({ message });
+  } catch (e) {
+    return res.status(400).send(e.message);
+  }
+}
 
 export default {
   createUserController,
   findAllUserController,
   findUserByIdController,
   updateUserController,
+  deleteUserController,
 };
