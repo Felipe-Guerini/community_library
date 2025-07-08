@@ -51,6 +51,13 @@ async function deleteAllBooksService() {
   return response;
 }
 
+async function searchBookService(search) {
+  console.log(`Service: searchBookService - Buscando por: "${search}"`);
+  const books = await bookRepository.searchBookRepository(search);
+
+  return books;
+}
+
 export default {
   createBookService,
   findAllBooksService,
@@ -58,4 +65,5 @@ export default {
   updateBookService,
   deleteBookService,
   deleteAllBooksService,
+  searchBookService,
 };

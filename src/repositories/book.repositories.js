@@ -108,7 +108,6 @@ function deleteAllBooksRepository() {
       "Repository: deleteAllBooksRepository - Executando DELETE FROM books"
     );
     db.run(`DELETE FROM books`, [], function (err) {
-      
       if (err) {
         console.error("ERRO NO DB.RUN (DELETE ALL BOOKS):", err);
         reject(err);
@@ -121,6 +120,22 @@ function deleteAllBooksRepository() {
   });
 }
 
+function searchBookRepository(search) {
+  return new Promise((resolve, reject) => {
+    db.all(
+      `SELECT * FROM books WHERE title LIKE ? OR author LIKE ?`,
+      [`%${search}%`, `%${search}%`],
+      (err, rows) => {
+        if (err) {
+          reject(err);
+        } else {
+          resolve(rows);
+        }
+      }
+    );
+  });
+}
+
 export default {
   createBookRepository,
   findAllBooksRepository,
@@ -128,4 +143,5 @@ export default {
   updateBookRepository,
   deleteBookRepository,
   deleteAllBooksRepository,
+  searchBookRepository,
 };

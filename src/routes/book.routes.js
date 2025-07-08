@@ -1,5 +1,3 @@
-// src/routes/book.routes.js
-
 import bookControllers from "../controller/book.controllers.js";
 import { Router } from "express";
 import { authMiddleware } from "../middlewares/auth.middlewares.js";
@@ -20,19 +18,19 @@ router.post(
   bookControllers.createBookController
 );
 
+router.get("/books/search", bookControllers.searchBookController);
+
 router.get(
   "/books/:id",
   validateBookId,
   bookControllers.findBookByIdController
 );
 
-// --- NOVA ROTA ADICIONADA AQUI (PARA DELETAR TODOS) ---
 router.delete(
-  "/books", // URL sem :id
-  authMiddleware, // Geralmente requer autenticação, talvez até um middleware de admin
-  bookControllers.deleteAllBooksController // Novo controller para esta ação
+  "/books",
+  authMiddleware,
+  bookControllers.deleteAllBooksController
 );
-// --- FIM DA NOVA ROTA ---
 
 router.patch(
   "/books/:id",
@@ -42,7 +40,7 @@ router.patch(
 );
 
 router.delete(
-  "/books/:id", // Sua rota DELETE /:id existente
+  "/books/:id",
   validateBookId,
   authMiddleware,
   bookControllers.deleteBookController
