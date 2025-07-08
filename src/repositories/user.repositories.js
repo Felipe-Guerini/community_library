@@ -34,11 +34,31 @@ function findUserByEmailRepository(email) {
   return new Promise((resolve, reject) => {
     db.get(
       `
-      SELECT id, username, email, avatar
+      SELECT id, username, email, avatar, password
       FROM users
       WHERE email = ?;
       `,
       [email],
+      (err, row) => {
+        if (err) {
+          reject(err);
+        } else {
+          resolve(row);
+        }
+      }
+    );
+  });
+}
+
+function findUserByUsernameRepository(username) {
+  return new Promise((resolve, reject) => {
+    db.get(
+      `
+      SELECT id, username, email, avatar
+      FROM users
+      WHERE username = ?;
+      `,
+      [username],
       (err, row) => {
         if (err) {
           reject(err);
@@ -102,12 +122,8 @@ function updateUserRepository(id, user) {
       }
     });
 
-    
     query = query.slice(0, -2);
-
-    
     query += " WHERE id = ?;";
-    
 
     values.push(id);
 
@@ -146,6 +162,7 @@ async function deleteUserRepository(id) {
 export default {
   createUserRepository,
   findUserByEmailRepository,
+  findUserByUsernameRepository,
   findUserByIdRepository,
   findAllUserRepository,
   updateUserRepository,

@@ -1,13 +1,20 @@
 import bcrypt from "bcrypt";
 import userRepository from "../repositories/user.repositories.js";
-import userRepositories from "../repositories/user.repositories.js";
+import { generateJWT } from "./auth.service.js"; 
 
 async function createUserService(newUser) {
-  const foundUser = await userRepository.findUserByEmailRepository(
+  const foundUserByEmail = await userRepository.findUserByEmailRepository(
     newUser.email
   );
 
-  if (foundUser) throw new Error("User already exists!");
+  if (foundUserByEmail) throw new Error("User with this email already exists!");
+
+  
+  const foundUserByUsername = await userRepository.findUserByUsernameRepository(
+    newUser.username
+  );
+  if (foundUserByUsername)
+    throw new Error("User with this username already exists!");
 
   const passHash = await bcrypt.hash(newUser.password, 10);
   const user = await userRepository.createUserRepository({
@@ -15,7 +22,9 @@ async function createUserService(newUser) {
     password: passHash,
   });
   if (!user) throw new Error("Error creating user!");
-  return user;
+  console.log(user.id)
+  const token = generateJWT(user.id);
+  return token;
 }
 
 async function findAllUsersService() {
@@ -35,7 +44,10 @@ async function updateUserService(newUser, userId) {
   if (newUser.password) {
     newUser.password = await bcrypt.hash(newUser.password, 10);
   }
-  const userUpdated = userRepository.updateUserRepository(userId, newUser);
+  const userUpdated = await userRepository.updateUserRepository(
+    userId,
+    newUser
+  ); // Adicionado 'await'
   return userUpdated;
 }
 
@@ -51,5 +63,5 @@ export default {
   findAllUsersService,
   findUserByIdService,
   updateUserService,
-  deleteUserService
+  deleteUserService,
 };
