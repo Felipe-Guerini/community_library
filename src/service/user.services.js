@@ -47,7 +47,7 @@ async function updateUserService(newUser, userId) {
   const userUpdated = await userRepository.updateUserRepository(
     userId,
     newUser
-  ); // Adicionado 'await'
+  ); 
   return userUpdated;
 }
 

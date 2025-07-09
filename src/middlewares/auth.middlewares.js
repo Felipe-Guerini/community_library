@@ -1,34 +1,53 @@
-import "dotenv/config";
 import jwt from "jsonwebtoken";
 import userService from "../service/user.services.js";
 
 export function authMiddleware(req, res, next) {
-  const tokenHeader = req.headers.authorization;
+  const { authorization: tokenHeader } = req.headers;
+
   if (!tokenHeader) {
-    return res.status(401).send({ message: "The token was not informed!" });
+    return res.status(401).send({ message: "O token não foi informado!" });
   }
+
   const partsToken = tokenHeader.split(" ");
   if (partsToken.length !== 2) {
-    return res.status(401).send({ message: "Invalid token" });
+    return res.status(401).send({ message: "Invalid token format" });
   }
+
   const [schema, token] = partsToken;
 
   if (!/^Bearer$/i.test(schema)) {
-    return res.status(401).send({ message: "Token malformatted" });
+    return res
+      .status(401)
+      .send({ message: "Token malformatted. Must be 'Bearer'." });
   }
 
   jwt.verify(token, process.env.SECRET_JWT, async (err, decoded) => {
     if (err) {
-      return res.status(401).send({ message: "Invalid token" });
+      if (err.name === "TokenExpiredError") {
+        return res.status(401).send({ message: "Token expirado." });
+      }
+      if (err.name === "JsonWebTokenError") {
+        return res.status(401).send({ message: "Token inválido." });
+      }
+      return res.status(401).send({ message: "Não autorizado." });
     }
 
-    const user = await userService.findUserByIdService(decoded.id);
-    if (!user || !user.id) {
-      return res.status(401).send({ message: "Invalid token" });
-    }
-    
-    req.userId = user.id;
+    try {
+      const user = await userService.findUserByIdService(decoded.id);
+      if (!user) {
+        return res
+          .status(401)
+          .send({ message: "Usuário associado ao token não encontrado." });
+      }
 
-    return next();
+      req.userId = user.id;
+      return next();
+    } catch (serviceError) {
+      console.error(
+        "Erro no middleware de autenticação ao buscar usuário:",
+        serviceError.message
+      );
+      return res.status(500).send({ message: "Erro interno de autenticação." });
+    }
   });
 }
