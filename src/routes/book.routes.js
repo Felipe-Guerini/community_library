@@ -9,38 +9,29 @@ import { bookSchema } from "../schema/book.schema.js";
 
 const router = Router();
 
-router.get("/books", bookControllers.findAllBooksController);
+router.get(bookControllers.findAllBooksController);
 
 router.post(
-  "/books",
   validate(bookSchema),
   authMiddleware,
   bookControllers.createBookController
 );
 
-router.get("/books/search", bookControllers.searchBookController);
+router.get("/search", bookControllers.searchBookController);
 
-router.get(
-  "/books/:id",
-  validateBookId,
-  bookControllers.findBookByIdController
-);
+router.get("/:id", validateBookId, bookControllers.findBookByIdController);
 
-router.delete(
-  "/books",
-  authMiddleware,
-  bookControllers.deleteAllBooksController
-);
+router.delete(authMiddleware, bookControllers.deleteAllBooksController);
 
 router.patch(
-  "/books/:id",
+  "/:id",
   validateBookId,
   authMiddleware,
   bookControllers.updateBookController
 );
 
 router.delete(
-  "/books/:id",
+  "/:id",
   validateBookId,
   authMiddleware,
   bookControllers.deleteBookController

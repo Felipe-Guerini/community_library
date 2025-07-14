@@ -6,7 +6,7 @@ import bookRepository from "../repositories/book.repositories.js";
 import sendEmail from "./email.service.js"; 
 
 
-cron.schedule("21 * * * *", async () => {
+cron.schedule("* * * * *", async () => {
   console.log(
     "⏰ Executando tarefa agendada (verificação de empréstimos vencendo)"
   );

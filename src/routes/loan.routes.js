@@ -10,18 +10,17 @@ import { authMiddleware } from "../middlewares/auth.middlewares.js";
 const router = Router();
 
 router.post(
-  "/loans",
   authMiddleware,
   validate(loanSchema),
   loanController.createLoanController
 );
 
-router.get("/loans", loanController.findAllLoansController);
+router.get(loanController.findAllLoansController);
 
-router.get("/loans/:id", validateLoanId, loanController.findLoanByIdController);
+router.get("/:id", validateLoanId, loanController.findLoanByIdController);
 
 router.delete(
-  "/loans/:id",
+  "/:id",
   validateLoanId,
   authMiddleware,
   loanController.deleteLoanController
