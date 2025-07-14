@@ -1,5 +1,6 @@
 import { userIdSchema } from "../schema/user.schema.js";
 import { bookIdSchema } from "../schema/book.schema.js";
+import { loanIdSchema } from "../schema/loan.schema.js";
 
 const validate = (schema) => (req, res, next) => {
   try {
@@ -26,7 +27,8 @@ const validateUserId = (req, res, next) => {
 
 const validateBookId = (req, res, next) => {
   try {
-    bookIdSchema.parse({ bookId: +req.params.id });
+    const bookId = +req.params.id;
+    bookIdSchema.parse({ bookId: bookId });
     next();
   } catch (error) {
     res
@@ -35,4 +37,23 @@ const validateBookId = (req, res, next) => {
   }
 };
 
-export { validate, validateUserId, validateBookId };
+const validateLoanId = (req, res, next) => {
+  try {
+    const loanId = +req.params.id;
+    loanIdSchema.parse({ loanId: loanId });
+    next();
+  } catch (error) {
+    console.error("ERRO NO VALIDATE LOAN ID MIDDLEWARE:");
+    console.error("Objeto de erro completo (ZodError):", error);
+    console.error("error.message:", error.message);
+    console.error("error.errors:", error.errors);
+    console.error("-----------------------------------");
+
+    res.status(400).json({
+      message: "ID do empréstimo inválido",
+      errors: error.errors,
+    });
+  }
+};
+
+export { validate, validateUserId, validateBookId, validateLoanId };

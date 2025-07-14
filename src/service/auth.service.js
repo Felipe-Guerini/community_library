@@ -14,7 +14,6 @@ async function loginService(email, password) {
   }
 
   const isPasswordValid = await bcrypt.compare(password, user.password);
-
   if (!isPasswordValid) {
     throw new Error("Email ou senha inválidos.");
   }

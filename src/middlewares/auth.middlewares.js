@@ -10,7 +10,7 @@ export function authMiddleware(req, res, next) {
 
   const partsToken = tokenHeader.split(" ");
   if (partsToken.length !== 2) {
-    return res.status(401).send({ message: "Invalid token format" });
+    return res.status(401).send({ message: "Formato de token inválido" });
   }
 
   const [schema, token] = partsToken;
@@ -18,7 +18,7 @@ export function authMiddleware(req, res, next) {
   if (!/^Bearer$/i.test(schema)) {
     return res
       .status(401)
-      .send({ message: "Token malformatted. Must be 'Bearer'." });
+      .send({ message: "Token malformatado. Deve ser 'Bearer'." });
   }
 
   jwt.verify(token, process.env.SECRET_JWT, async (err, decoded) => {
@@ -44,10 +44,12 @@ export function authMiddleware(req, res, next) {
       return next();
     } catch (serviceError) {
       console.error(
-        "Erro no middleware de autenticação ao buscar usuário:",
+        "Erro no middleware de autenticação ao buscar usuário no serviço:",
         serviceError.message
       );
-      return res.status(500).send({ message: "Erro interno de autenticação." });
+      return res
+        .status(500)
+        .send({ message: "Erro interno do servidor ao autenticar." });
     }
   });
 }

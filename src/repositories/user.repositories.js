@@ -21,6 +21,7 @@ function createUserRepository(newUser) {
       [username, email, password, avatar],
       function (err) {
         if (err) {
+          console.error("Repository: createUserRepository - Erro DB:", err);
           reject(err);
         } else {
           resolve({ id: this.lastID, ...newUser });
@@ -41,6 +42,7 @@ function findUserByEmailRepository(email) {
       [email],
       (err, row) => {
         if (err) {
+          console.error("Repository: findUserByEmailRepository - Erro DB:", err);
           reject(err);
         } else {
           resolve(row);
@@ -61,6 +63,7 @@ function findUserByUsernameRepository(username) {
       [username],
       (err, row) => {
         if (err) {
+          console.error("Repository: findUserByUsernameRepository - Erro DB:", err);
           reject(err);
         } else {
           resolve(row);
@@ -81,6 +84,7 @@ function findUserByIdRepository(id) {
       [id],
       (err, row) => {
         if (err) {
+          console.error("Repository: findUserByIdRepository - Erro DB:", err);
           reject(err);
         } else {
           resolve(row);
@@ -99,6 +103,7 @@ function findAllUserRepository() {
       [],
       (err, rows) => {
         if (err) {
+          console.error("Repository: findAllUserRepository - Erro DB:", err);
           reject(err);
         } else {
           resolve(rows);
@@ -122,19 +127,30 @@ function updateUserRepository(id, user) {
       }
     });
 
-    query = query.slice(0, -2);
+    if (values.length === 0) {
+        console.warn("Repository: updateUserRepository - Nenhum campo para atualizar fornecido.");
+        return reject(new Error("Nenhum campo para atualizar."));
+    }
+
+    query = query.slice(0, -2); 
     query += " WHERE id = ?;";
 
     values.push(id);
 
-    console.log(`Query: ${query}`);
-    console.log(`Values: ${values}`);
+    console.log(`Repository: updateUserRepository - Query: ${query}`); 
+    console.log(`Repository: updateUserRepository - Values: ${values}`); 
 
     db.run(query, values, (err) => {
       if (err) {
+        console.error("Repository: updateUserRepository - Erro DB:", err);
         reject(err);
       } else {
-        resolve({ ...user, id });
+        if (this.changes === 0) {
+            console.warn(`Repository: updateUserRepository - Nenhum usuário encontrado com ID ${id} para atualizar.`);
+            reject(new Error("Usuário não encontrado para atualização ou nenhum dado alterado."));
+        } else {
+            resolve({ ...user, id });
+        }
       }
     });
   });
@@ -150,9 +166,14 @@ async function deleteUserRepository(id) {
       [id],
       (err) => {
         if (err) {
+          console.error("Repository: deleteUserRepository - Erro DB:", err);
           reject(err);
         } else {
-          resolve({ message: "User deleted successfully", id });
+          if (this.changes === 0) {
+              resolve({ message: "Nenhum usuário encontrado para deletar.", id });
+          } else {
+              resolve({ message: "User deleted successfully", id });
+          }
         }
       }
     );

@@ -48,6 +48,40 @@ function findAllLoansRepository() {
   });
 }
 
+function findLoanByIdRepository(loanId) {
+  return new Promise((resolve, reject) => {
+    db.get(`SELECT * FROM loans WHERE id = ?`, [loanId], (err, row) => {
+      if (err) {
+        console.error("Repository: findLoanByIdRepository - Erro DB:", err);
+        reject(err);
+      } else {
+        resolve(row);
+      }
+    });
+  });
+}
+
+function deleteLoanRepository(loanId) {
+  return new Promise((resolve, reject) => {
+    db.run(`DELETE FROM loans WHERE id = ?`, [loanId], function (err) {
+      if (err) {
+        console.error("Repository: deleteLoanRepository - Erro DB:", err);
+        reject(err);
+      } else {
+        if (this.changes === 0) {
+          resolve({
+            message:
+              "Nenhum empréstimo encontrado com o ID especificado para deletar.",
+            loanId,
+          });
+        } else {
+          resolve({ message: "Empréstimo deletado com sucesso", loanId });
+        }
+      }
+    });
+  });
+}
+
 function findActiveLoanByBookId(bookId) {
   return new Promise((resolve, reject) => {
     db.get(
@@ -68,5 +102,7 @@ function findActiveLoanByBookId(bookId) {
 export default {
   createLoanRepository,
   findAllLoansRepository,
+  findLoanByIdRepository,
+  deleteLoanRepository,
   findActiveLoanByBookId,
 };
