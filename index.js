@@ -5,9 +5,6 @@ import bookRouters from "./src/routes/book.routes.js";
 import loanRouters from "./src/routes/loan.routes.js";
 import "./src/service/cron.service.js";
 
-console.log("Conteúdo de process.env.SECRET_JWT:", process.env.SECRET_JWT);
-console.log("Tipo de process.env.SECRET_JWT:", typeof process.env.SECRET_JWT);
-
 const app = express();
 
 const port = process.env.PORT || 3000;
@@ -19,5 +16,4 @@ app.use(loanRouters);
 
 app.listen(port, () => {
   console.log(`Servidor rodando na porta 3000 ${port}`);
-  console.log("Conexão com o banco de dados estabelecida com sucesso");
 });
